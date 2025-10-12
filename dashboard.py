@@ -153,11 +153,12 @@ def main():
         filtered_df = df[df['WY event'] == selected_event]
 
     # --- Secondary Filter: Output Attributes ---
-    # Get all unique, non-blank values from the output columns of the already-filtered data
-    all_output_values = filtered_df[output_cols].values.ravel()
+    # --- UPDATE: Exclude 'WY event' values from the filter options ---
+    output_attribute_cols = [col for col in output_cols if col != 'WY event']
+    all_output_values = filtered_df[output_attribute_cols].values.ravel()
     unique_attributes = pd.Series(all_output_values).dropna().unique()
-    # Clean the list to remove empty strings and the event name itself
-    cleaned_attributes = [attr for attr in unique_attributes if str(attr).strip() != '' and attr != selected_event]
+    # Clean the list to remove empty strings
+    cleaned_attributes = [attr for attr in unique_attributes if str(attr).strip() != '']
 
     selected_attributes = st.sidebar.multiselect(
         "2. (Optional) Filter by WY Output Attributes:",
