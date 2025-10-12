@@ -65,7 +65,7 @@ def display_merged_rules(df, input_cols, output_cols):
     # dropna=False is important to treat empty/null values as a distinct group key.
     grouped = df.groupby(by=output_cols, dropna=False)
 
-    st.subheader(f"Found {len(grouped)} Unique Rule(s)")
+    st.subheader(f"Found {len(grouped)} Unique Output Rule(s)")
     
     rule_counter = 0
     # Iterate over each unique output group
@@ -135,14 +135,22 @@ def main():
 
     # --- Primary Filter: WY Event ---
     wy_event_options = sorted(df['WY event'].unique().tolist())
+    # --- UPDATE: Add 'All' as the first option for the filter ---
+    options_with_all = ['All'] + wy_event_options
+    
     selected_event = st.sidebar.selectbox(
         "1. Select a 'WY event':",
-        options=wy_event_options,
-        index=0
+        options=options_with_all,
+        index=0 # 'All' is the default because it's the first item (index 0)
     )
     
-    # Filter dataframe based on the selected event
-    filtered_df = df[df['WY event'] == selected_event]
+    # --- UPDATE: Filter dataframe based on the selection, handling the 'All' case ---
+    if selected_event == 'All':
+        # If 'All' is selected, use the entire dataframe
+        filtered_df = df.copy()
+    else:
+        # Otherwise, filter by the specific event
+        filtered_df = df[df['WY event'] == selected_event]
 
     # --- Secondary Filter: Output Attributes ---
     # Get all unique, non-blank values from the output columns of the already-filtered data
